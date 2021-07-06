@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 
 import com.borba.course.entities.User;
 import com.borba.course.repositories.UserRepository;
+import com.borba.course.services.exceptions.ResourceNotFoundException;
 
 @Service
 public class UserService {
@@ -21,7 +22,7 @@ public class UserService {
 	
 	public User findById(Long id) {
 		Optional<User> obj = repository.findById(id);
-		return obj.get();
+		return obj.orElseThrow(() -> new ResourceNotFoundException(id));
 	}
 	
 	public User insert(User obj) {
@@ -30,6 +31,20 @@ public class UserService {
 	
 	public void delete(Long id) {
 		repository.deleteById(id);
+	}
+	
+	public User update (Long id, User obj) {
+		Optional<User> entity = repository.findById(id);
+		updateData(entity, obj);
+		return repository.save(entity.get());
+		
+	}
+
+	private void updateData(Optional<User> entity, User obj) {
+		entity.get().setName(obj.getName());
+		entity.get().setEmail(obj.getEmail());
+		entity.get().setPhone(obj.getPhone());
+		
 	}
 }
 
